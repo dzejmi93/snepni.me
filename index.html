@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>snap.me | Digitalna Jednokratna Kamera</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #121212; color: #fff; text-align: center; display: flex; flex-direction: column; height: 100vh; justify-content: space-between; padding: 20px 15px; }
+        
+        header h1 { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: #fff; }
+        header h1 span { color: #ff9500; }
+        header p { font-size: 13px; color: #aaa; margin-top: 4px; }
+
+        /* Kontejner za kameru sa retro izgledom */
+        .camera-container { position: relative; width: 100%; max-width: 400px; margin: 0 auto; aspect-ratio: 3/4; background: #000; border-radius: 20px; overflow: hidden; border: 2px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        
+        /* Uživo retro filter preko CSS-a */
+        video { width: 100%; height: 100%; object-fit: cover; filter: sepia(0.25) contrast(1.15) brightness(0.95) saturate(1.2); }
+        
+        /* Skriveni canvas za obradu finalne slike */
+        canvas { display: none; }
+
+        /* Kontrole na dnu */
+        .controls { margin-bottom: 20px; }
+        .counter { font-size: 14px; color: #ff9500; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .snap-btn { width: 75px; height: 75px; border-radius: 50%; background: #ff9500; border: 4px solid #fff; cursor: pointer; margin: 0 auto; outline: none; box-shadow: 0 0 15px rgba(255,149,0,0.5); transition: transform 0.1s; }
+        .snap-btn:active { transform: scale(0.9); }
+        .snap-btn:disabled { background: #555; border-color: #888; box-shadow: none; cursor: not-allowed; }
+
+        /* Poruka nakon slikanja */
+        .status-msg { font-size: 14px; margin-top: 10px; min-height: 20px; color: #4cd964; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>snap<span>.me</span></h1>
+        <p>📸 Slike idu na razvijanje! Album se otključava sutra.</p>
+    </header>
+
+    <div class="camera-container">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="controls">
+        <div class="counter" id="counter">Preostalo slika: 5/5</div>
+        <button class="snap-btn" id="snap-btn" onclick="takePhoto()"></button>
+        <div class="status-msg" id="status-msg"></div>
+    </div>
+
+    <script>
+        // *** OVDE UNESI SVOJ GOOGLE SCRIPT URL IZ KORAKA 2 ***
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/u/2/s/AKfycbw0LyhtdCxUMDjr3tqWLh2uraq_UdcmZgrsxT-2RRsTcx0csa5bnw3h1mnYm-ozAVq1BA/exec"; 
+        
+        const MAX_PHOTOS = 5;
+        let photosLeft = localStorage.getItem('snap_me_photos') !== null ? parseInt(localStorage.getItem('snap_me_photos')) : MAX_PHOTOS;
+        
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+        const snapBtn = document.getElementById('snap-btn');
+        const counterEl = document.getElementById('counter');
+        const statusEl = document.getElementById('status-msg');
+
+        // Pokretanje zadnje kamere na telefonu
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { statusEl.innerText = "Molimo vas omogućite pristup kameri."; statusEl.style.color = "#ff3b30"; });
+
+        function updateUI() {
+            counterEl.innerText = `Preostalo slika: ${photosLeft}/${MAX_PHOTOS}`;
+            if (photosLeft <= 0) {
+                snapBtn.disabled = true;
+                counterEl.innerText = "Ispucali ste sve fotke za večeras! 🎉";
+                counterEl.style.color = "#ff3b30";
+            }
+        }
+        updateUI();
+
+        function takePhoto() {
+            if (photosLeft <= 0) return;
+
+            snapBtn.disabled = true;
+            statusEl.innerText = "Slikam i šaljem na razvijanje...";
+            statusEl.style.color = "#ff9500";
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+
+            // 1. Crtanje slike sa kamere na canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // 2. Primena Vintage/Retro filtera na sliku
+            let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                // Blagi sepia + topli tonovi
+                let r = data[i], g = data[i+1], b = data[i+2];
+                data[i]     = (r * 0.393) + (g * 0.769) + (b * 0.189) + 30; // Red
+                data[i+1]   = (r * 0.349) + (g * 0.686) + (b * 0.168);      // Green
+                data[i+2]   = (r * 0.272) + (g * 0.534) + (b * 0.131);      // Blue
+            }
+            ctx.putImageData(imageData, 0, 0);
+
+            // 3. Dodavanje retro žutog datuma u ugao (kao na filmu)
+            const d = new Date();
+            const dateStr = `'${String(d.getFullYear()).slice(-2)} ${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getDate()).padStart(2,'0')}`;
+            ctx.font = "bold 24px monospace";
+            ctx.fillStyle = "#ff9500";
+            ctx.shadowColor = "black";
+            ctx.shadowBlur = 4;
+            ctx.fillText(dateStr, canvas.width - 150, canvas.height - 20);
+
+            // 4. Pretvaranje u Base64 i slanje na Google Drive
+            const base64Image = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ base64: base64Image })
+            }).then(() => {
+                photosLeft--;
+                localStorage.setItem('snap_me_photos', photosLeft);
+                updateUI();
+                statusEl.innerText = "Slika uspešno poslata! 📸";
+                statusEl.style.color = "#4cd964";
+                if(photosLeft > 0) snapBtn.disabled = false;
+            }).catch(err => {
+                statusEl.innerText = "Greška pri slanju. Pokušajte ponovo.";
+                statusEl.style.color = "#ff3b30";
+                snapBtn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
