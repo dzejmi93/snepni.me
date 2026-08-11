@@ -6,11 +6,10 @@
     <title>snap.me</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* dynamic viewport height (dvh) rešava bagove na mobilnim pretraživačima */
         body { 
             background-color: #0d0d0d; 
             color: #ffffff; 
@@ -20,65 +19,115 @@
             height: 100dvh; 
             justify-content: space-between; 
             align-items: center; 
-            padding: calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 12px) 16px; 
+            padding: calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 16px) 18px; 
             overflow: hidden; 
         }
         
-        /* Header */
-        header { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .logo { font-size: 22px; font-weight: 500; letter-spacing: -0.5px; opacity: 0.9; }
+        /* Header sa većim slovima */
+        header { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .logo { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
         .logo span { font-weight: 300; opacity: 0.5; }
 
-        /* Filter Switcher */
-        .filter-switcher { display: flex; background: rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 3px; gap: 4px; border: 1px solid rgba(255, 255, 255, 0.05); }
-        .filter-btn { background: transparent; border: none; color: rgba(255, 255, 255, 0.4); padding: 5px 14px; font-size: 11px; font-weight: 500; border-radius: 16px; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s ease; }
-        .filter-btn.active { background: rgba(255, 255, 255, 0.2); color: #fff; }
+        /* Filter Switcher - veća dugmad */
+        .filter-switcher { display: flex; background: rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 4px; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.08); }
+        .filter-btn { background: transparent; border: none; color: rgba(255, 255, 255, 0.5); padding: 7px 18px; font-size: 13px; font-weight: 600; border-radius: 16px; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s ease; }
+        .filter-btn.active { background: rgba(255, 255, 255, 0.25); color: #fff; }
 
-        /* Viewport kamere za sve ekrane */
+        /* Viewport kamere */
         .viewport { 
             position: relative; 
             width: 100%; 
-            max-width: 380px; 
-            max-height: 58dvh; 
+            max-width: 400px; 
+            max-height: 55dvh; 
             aspect-ratio: 3/4; 
             background: #000; 
             border-radius: 28px; 
             overflow: hidden; 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8); 
             margin: auto 0; 
         }
         
         video { width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s ease, transform 0.3s ease; }
         video.vintage { filter: sepia(0.2) contrast(1.1) saturate(1.15); }
         video.original { filter: none; }
-        video.mirror { transform: scaleX(-1); } /* Zrcaljenje za selfie kameru */
+        video.mirror { transform: scaleX(-1); }
 
         canvas { display: none; }
 
-        /* Flash efekat */
+        /* Flash efekt */
         .flash { position: absolute; top:0; left:0; width:100%; height:100%; background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-out; z-index: 10; }
         .flash.active { opacity: 0.85; }
 
-        /* Bedževi unutar kamere */
-        .counter-badge { position: absolute; top: 14px; right: 14px; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 5px 11px; border-radius: 20px; font-size: 11px; font-weight: 500; letter-spacing: 0.8px; border: 1px solid rgba(255,255,255,0.1); z-index: 5; }
-        
-        /* Dugme za prebacivanje kamere (Flip) */
-        .flip-btn { position: absolute; bottom: 14px; right: 14px; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; z-index: 5; transition: transform 0.2s ease; }
-        .flip-btn:active { transform: scale(0.88) rotate(180deg); }
-        .flip-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        /* Retro LED brojač u donjem levom uglu (kao na jednokratnom aparatu) */
+        .retro-counter { 
+            position: absolute; 
+            bottom: 16px; 
+            left: 16px; 
+            background: rgba(0, 0, 0, 0.65); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px); 
+            padding: 2px 10px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255, 140, 0, 0.4); 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            z-index: 5; 
+        }
+        .retro-counter .label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: rgba(255,255,255,0.6); letter-spacing: 0.5px; }
+        .retro-counter .number { font-family: 'VT323', monospace; font-size: 26px; color: #ff8c00; text-shadow: 0 0 6px rgba(255,140,0,0.6); line-height: 1; }
+
+        /* Mini Galerija u donjem desnom uglu */
+        .gallery-thumb { 
+            position: absolute; 
+            bottom: 16px; 
+            right: 16px; 
+            width: 44px; 
+            height: 44px; 
+            border-radius: 12px; 
+            border: 2px solid rgba(255, 255, 255, 0.8); 
+            overflow: hidden; 
+            background: rgba(0,0,0,0.5); 
+            cursor: pointer; 
+            z-index: 5; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+        }
+        .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-thumb.empty { border-color: rgba(255,255,255,0.2); }
+
+        /* Flip camera dugme pri vrhu desno */
+        .flip-btn { position: absolute; top: 16px; right: 16px; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; z-index: 5; }
+        .flip-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* Zoom Kontrole */
+        .zoom-controls { display: flex; gap: 8px; background: rgba(255, 255, 255, 0.06); padding: 3px 6px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .zoom-btn { background: transparent; border: none; color: rgba(255, 255, 255, 0.5); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 14px; cursor: pointer; }
+        .zoom-btn.active { background: rgba(255, 255, 255, 0.2); color: #fff; }
 
         /* Kontrole na dnu */
-        .controls { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; margin-bottom: 6px; }
+        .controls { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; }
         
-        .shutter-outer { width: 72px; height: 72px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.8); display: flex; align-items: center; justify-content: center; background: transparent; cursor: pointer; transition: transform 0.2s cubic-bezier(0.1, 0, 0, 1); outline: none; }
-        .shutter-inner { width: 58px; height: 58px; border-radius: 50%; background: #ffffff; transition: transform 0.15s ease, background 0.3s; }
+        .shutter-outer { width: 78px; height: 78px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.9); display: flex; align-items: center; justify-content: center; background: transparent; cursor: pointer; outline: none; }
+        .shutter-inner { width: 64px; height: 64px; border-radius: 50%; background: #ffffff; }
         
         .shutter-outer:active { transform: scale(0.92); }
         .shutter-outer:disabled { border-color: rgba(255, 255, 255, 0.15); cursor: not-allowed; }
         .shutter-outer:disabled .shutter-inner { background: rgba(255, 255, 255, 0.15); }
 
-        .status-text { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.5); letter-spacing: 0.2px; height: 14px; }
+        .status-text { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.7); letter-spacing: 0.2px; height: 18px; }
+
+        /* Modal za gledanje tvoje galerije */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 100; flex-direction: column; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; }
+        .modal-title { font-size: 18px; font-weight: 600; }
+        .close-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; overflow-y: auto; width: 100%; }
+        .gallery-grid img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
@@ -94,7 +143,14 @@
     <div class="viewport">
         <video id="webcam" class="vintage" autoplay playsinline></video>
         <div class="flash" id="flash"></div>
-        <div class="counter-badge" id="counter">5 LEFT</div>
+        
+        <!-- Retro brojač sa leve strane -->
+        <div class="retro-counter">
+            <span class="label">EXP</span>
+            <span class="number" id="counter-num">05</span>
+        </div>
+
+        <!-- Flip kamera -->
         <button class="flip-btn" onclick="toggleCamera()" title="Prebaci kameru">
             <svg viewBox="0 0 24 24">
                 <path d="M20 10c0-4.418-3.582-8-8-8s-8 3.582-8 8e0 1.281.305 2.415.842 3.415M4 14c0 4.418 3.582 8 8 8s8-3.582 8-8e0-1.281-.305-2.415-.842-3.415"/>
@@ -102,14 +158,38 @@
                 <polyline points="15 13 20 10 20 16"/>
             </svg>
         </button>
+
+        <!-- Mini Galerija sa desne strane -->
+        <div class="gallery-thumb empty" id="gallery-thumb" onclick="openGallery()">
+            <span id="thumb-placeholder" style="font-size:10px; color:#aaa;">EMPTY</span>
+            <img id="thumb-img" style="display:none;" />
+        </div>
+
         <canvas id="canvas"></canvas>
     </div>
 
     <div class="controls">
+        <!-- Zoom Dugmići -->
+        <div class="zoom-controls">
+            <button class="zoom-btn active" onclick="setZoom(1, this)">1x</button>
+            <button class="zoom-btn" onclick="setZoom(2, this)">2x</button>
+            <button class="zoom-btn" onclick="setZoom(3, this)">3x</button>
+            <button class="zoom-btn" onclick="setZoom(5, this)">5x</button>
+        </div>
+
         <button class="shutter-outer" id="snap-btn" onclick="takePhoto()">
             <div class="shutter-inner"></div>
         </button>
         <div class="status-text" id="status-text">Ready</div>
+    </div>
+
+    <!-- Modal za tvoju galeriju -->
+    <div class="modal" id="gallery-modal">
+        <div class="modal-header">
+            <div class="modal-title">Your Snaps</div>
+            <button class="close-btn" onclick="closeGallery()">✕</button>
+        </div>
+        <div class="gallery-grid" id="gallery-grid"></div>
     </div>
 
     <script>
@@ -118,14 +198,17 @@
         
         const MAX_PHOTOS = 5;
         let photosLeft = localStorage.getItem('snap_me_photos') !== null ? parseInt(localStorage.getItem('snap_me_photos')) : MAX_PHOTOS;
+        let localGallery = JSON.parse(localStorage.getItem('snap_me_gallery') || '[]');
+        
         let currentFilter = 'vintage';
-        let currentFacingMode = 'environment'; // Zadnja kamera po defaultu
+        let currentFacingMode = 'environment';
         let currentStream = null;
+        let videoTrack = null;
         
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const snapBtn = document.getElementById('snap-btn');
-        const counterEl = document.getElementById('counter');
+        const counterNum = document.getElementById('counter-num');
         const statusEl = document.getElementById('status-text');
         const flashEl = document.getElementById('flash');
 
@@ -140,6 +223,7 @@
             })
             .then(stream => { 
                 currentStream = stream;
+                videoTrack = stream.getVideoTracks()[0];
                 video.srcObject = stream; 
                 if (currentFacingMode === 'user') {
                     video.classList.add('mirror');
@@ -155,6 +239,19 @@
         function toggleCamera() {
             currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
             startCamera();
+        }
+
+        function setZoom(zoomLevel, btn) {
+            document.querySelectorAll('.zoom-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (videoTrack && typeof videoTrack.getCapabilities === 'function') {
+                const capabilities = videoTrack.getCapabilities();
+                if (capabilities.zoom) {
+                    const zoomVal = Math.min(Math.max(zoomLevel, capabilities.zoom.min), capabilities.zoom.max);
+                    videoTrack.applyConstraints({ advanced: [{ zoom: zoomVal }] });
+                }
+            }
         }
 
         function setFilter(mode) {
@@ -173,11 +270,19 @@
         }
 
         function updateUI() {
-            counterEl.innerText = `${photosLeft} LEFT`;
+            counterNum.innerText = photosLeft < 10 ? `0${photosLeft}` : photosLeft;
             if (photosLeft <= 0) {
                 snapBtn.disabled = true;
-                counterEl.innerText = "0 LEFT";
                 statusEl.innerText = "Camera locked for tonight.";
+            }
+
+            // Osvežavanje mini galerije
+            if (localGallery.length > 0) {
+                const lastImg = localGallery[localGallery.length - 1];
+                document.getElementById('thumb-img').src = lastImg;
+                document.getElementById('thumb-img').style.display = 'block';
+                document.getElementById('thumb-placeholder').style.display = 'none';
+                document.getElementById('gallery-thumb').classList.remove('empty');
             }
         }
 
@@ -197,7 +302,6 @@
             canvas.width = video.videoWidth || 640;
             canvas.height = video.videoHeight || 480;
 
-            // Ako je prednja kamera, moramo i sliku na canvasu okrenuti da ne bude izavrgnuta
             if (currentFacingMode === 'user') {
                 ctx.translate(canvas.width, 0);
                 ctx.scale(-1, 1);
@@ -205,12 +309,10 @@
 
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Vraćanje transformacije pre dodavanja datuma i filtera
             if (currentFacingMode === 'user') {
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
             }
 
-            // Vintage Sepia/Film obrada
             if (currentFilter === 'vintage') {
                 let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 let data = imageData.data;
@@ -223,7 +325,6 @@
                 ctx.putImageData(imageData, 0, 0);
             }
 
-            // Narandžasti retro datum
             const d = new Date();
             const dateStr = `'${String(d.getFullYear()).slice(-2)} ${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getDate()).padStart(2,'0')}`;
             ctx.font = "500 20px 'Inter', monospace";
@@ -232,7 +333,8 @@
             ctx.shadowBlur = 4;
             ctx.fillText(dateStr, canvas.width - 130, canvas.height - 24);
 
-            const base64Image = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+            const fullDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            const base64Image = fullDataUrl.split(',')[1];
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
@@ -242,6 +344,11 @@
             }).then(() => {
                 photosLeft--;
                 localStorage.setItem('snap_me_photos', photosLeft);
+                
+                // Čuvanje fotke u lokalnoj galeriji uređaja
+                localGallery.push(fullDataUrl);
+                localStorage.setItem('snap_me_gallery', JSON.stringify(localGallery));
+
                 updateUI();
                 if(photosLeft > 0) {
                     statusEl.innerText = "Saved to album";
@@ -254,7 +361,23 @@
             });
         }
 
-        // Pokretanje
+        /* Galerija Modal Funkcije */
+        function openGallery() {
+            if(localGallery.length === 0) return;
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = '';
+            localGallery.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                grid.appendChild(img);
+            });
+            document.getElementById('gallery-modal').classList.add('active');
+        }
+
+        function closeGallery() {
+            document.getElementById('gallery-modal').classList.remove('active');
+        }
+
         startCamera();
         updateUI();
     </script>
