@@ -25,7 +25,7 @@
         
         /* Header */
         header { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .logo { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+        .logo { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; cursor: pointer; user-select: none; }
         .logo span { font-weight: 300; opacity: 0.5; }
 
         /* Filter Switcher */
@@ -59,62 +59,52 @@
         .flash { position: absolute; top:0; left:0; width:100%; height:100%; background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-out; z-index: 10; }
         .flash.active { opacity: 0.85; }
 
-        /* ANALOGNI PROZORČIĆ SA BROJAČEM (Kao na Fujifilm / Kodak jednokratnoj kameri) */
-        .analog-counter-window {
+        /* RETRO PRAVOUGAONI PROZORČIĆ SA BROJAČEM (Kao Kodak / Fujifilm) */
+        .disposable-counter-box {
             position: absolute;
             bottom: 16px;
             left: 16px;
-            width: 58px;
-            height: 58px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #2a2a2a, #111111);
-            border: 2px solid #333;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.6);
+            background: linear-gradient(180deg, #1f1f1f 0%, #111111 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 4px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 4px 10px rgba(0,0,0,0.5);
             z-index: 5;
-            overflow: hidden;
+            min-width: 52px;
         }
 
-        /* Crveni indikator/strelica na vrhu prozorčića */
-        .analog-counter-window::before {
+        /* Red indicator notch */
+        .disposable-counter-box::after {
             content: '';
             position: absolute;
-            top: 3px;
-            width: 0;
-            height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 6px solid #e63946;
-            z-index: 6;
+            top: -1px;
+            width: 8px;
+            height: 2px;
+            background: #ff3b30;
+            border-radius: 2px;
         }
 
-        .analog-dial {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-top: 2px;
-        }
-
-        .analog-number {
+        .disposable-number {
             font-family: 'VT323', monospace;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             color: #ff9500;
-            line-height: 0.9;
-            text-shadow: 0 0 2px rgba(255, 149, 0, 0.4);
+            line-height: 1;
+            text-shadow: 0 0 4px rgba(255, 149, 0, 0.5);
+            letter-spacing: 1px;
         }
 
-        .analog-label {
-            font-size: 7px;
+        .disposable-label {
+            font-size: 8px;
             font-weight: 700;
-            color: rgba(255,255,255,0.4);
-            letter-spacing: 0.5px;
-            margin-top: 2px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.8px;
             text-transform: uppercase;
+            margin-top: -1px;
         }
 
         /* Mini Galerija sa desne strane */
@@ -138,10 +128,28 @@
         .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
         .gallery-thumb.empty { border-color: rgba(255,255,255,0.2); }
 
-        /* Flip camera dugme */
-        .flip-btn { position: absolute; top: 16px; right: 16px; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; z-index: 5; transition: transform 0.2s ease; }
-        .flip-btn:active { transform: scale(0.9) rotate(180deg); }
-        .flip-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        /* Nova ultra-moderna ikona za rotiranje kamere */
+        .flip-btn { 
+            position: absolute; 
+            top: 16px; 
+            right: 16px; 
+            background: rgba(0, 0, 0, 0.45); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            border: 1px solid rgba(255,255,255,0.18); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            color: #fff; 
+            z-index: 5; 
+            transition: all 0.2s ease; 
+        }
+        .flip-btn:active { transform: scale(0.88) rotate(180deg); }
+        .flip-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
         /* Zoom Kontrole */
         .zoom-controls { display: flex; gap: 8px; background: rgba(255, 255, 255, 0.06); padding: 4px 8px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -188,7 +196,8 @@
 <body>
 
     <header>
-        <div class="logo">snap<span>.me</span></div>
+        <!-- 3 Brza klika na logo resetuju fotke za testiranje -->
+        <div class="logo" onclick="handleLogoClick()">snap<span>.me</span></div>
         <div class="filter-switcher">
             <button class="filter-btn active" id="btn-vintage" onclick="setFilter('vintage')">VINTAGE</button>
             <button class="filter-btn" id="btn-original" onclick="setFilter('original')">ORIGINAL</button>
@@ -199,20 +208,19 @@
         <video id="webcam" class="vintage" autoplay playsinline></video>
         <div class="flash" id="flash"></div>
         
-        <!-- Analogni kružni prozorčić brojača sa crvenom strelicom -->
-        <div class="analog-counter-window">
-            <div class="analog-dial">
-                <span class="analog-number" id="counter-num">24</span>
-                <span class="analog-label">EXP</span>
-            </div>
+        <!-- Analogni prozorčić za brojač (24 EXP) -->
+        <div class="disposable-counter-box">
+            <span class="disposable-number" id="counter-num">24</span>
+            <span class="disposable-label">EXP</span>
         </div>
 
-        <!-- Ikona za prebacivanje kamere -->
+        <!-- Nova ikona za prebacivanje kamere -->
         <button class="flip-btn" onclick="toggleCamera()" title="Prebaci kameru">
             <svg viewBox="0 0 24 24">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <path d="M12 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
-                <path d="M17 12a5 5 0 0 1-1.5 3.5M7 12a5 5 0 0 1 1.5-3.5"/>
+                <path d="M20 4v5h-5"/>
+                <path d="M4 20v-5h5"/>
+                <path d="M18.36 18.36A9 9 0 0 0 20 10.5 9 9 0 0 0 5.64 5.64L4 9"/>
+                <path d="M5.64 5.64A9 9 0 0 0 4 13.5 9 9 0 0 0 18.36 18.36L20 15"/>
             </svg>
         </button>
 
@@ -272,12 +280,37 @@
         let videoTrack = null;
         let currentStoryIndex = 0;
         
+        // Tajni reset za testiranje
+        let logoClicks = 0;
+        let logoTimer = null;
+
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const snapBtn = document.getElementById('snap-btn');
         const counterNum = document.getElementById('counter-num');
         const statusEl = document.getElementById('status-text');
         const flashEl = document.getElementById('flash');
+
+        function handleLogoClick() {
+            logoClicks++;
+            clearTimeout(logoTimer);
+            if (logoClicks >= 3) {
+                localStorage.removeItem('snap_me_photos');
+                localStorage.removeItem('snap_me_gallery');
+                photosLeft = MAX_PHOTOS;
+                localGallery = [];
+                updateUI();
+                snapBtn.disabled = false;
+                statusEl.innerText = "Dev Reset: 24 Snaps Restored!";
+                document.getElementById('thumb-img').style.display = 'none';
+                document.getElementById('thumb-placeholder').style.display = 'block';
+                document.getElementById('gallery-thumb').classList.add('empty');
+                logoClicks = 0;
+                setTimeout(() => { statusEl.innerText = "Ready"; }, 2500);
+            } else {
+                logoTimer = setTimeout(() => { logoClicks = 0; }, 1000);
+            }
+        }
 
         function startCamera() {
             if (currentStream) {
